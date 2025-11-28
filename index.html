@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>j5create Remote Control</title>
+    <link rel="icon" type="image/png" href="favicon.png?v=124">
+    <style>
+        .div-main {
+            display: flex;
+            height: calc(var(--vh, 1vh) * 100 - 4px);
+            border: 2px solid rgb(200,250,200);
+            border-radius: 0.5%;
+            background: #f6f2f2;
+        }
+
+        .top-bar-wrapper {
+            display: flex;
+            flex-shrink: 0; /* 不要被擠壓 */
+            justify-content: flex-end; /* 靠右對齊 */
+            width: auto;
+            margin-left: 3px;
+            border-left: 2px solid rgb(210,210,210);
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: stretch; /* 垂直置中 */
+            gap: 1px; /* 按鈕之間留間距 */
+            flex-direction: column;
+            width: 200px; /* 固定寬度 */
+            height: 930px;
+            transition: width 0.6s ease; /* 收起/展開有動畫 */
+            overflow: hidden; /* 收起時隱藏內容 */
+            background: #f6f2f2;
+            transform-origin: right top; /* 右上角作為縮放基準 */
+            overflow: visible;
+            padding-left: 2px;
+            padding-right: 2px;
+        }
+
+            .top-bar.collapsed {
+                width: 60px; /* 收起時只留一個按鈕 */
+            }
+
+                .top-bar.collapsed .title1 {
+                    width: 60px; /* 跟 topbar 收起寬度一致 */
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .top-bar.collapsed .span1 {
+                    width: 50px; /* 跟 topbar 收起寬度一致 */
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .top-bar.collapsed h2 {
+                    width: 60px; /* 收起狀態 */
+                    height: 24px;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                }
+
+                .top-bar.collapsed div {
+                    width: 60px; /* 收起狀態 */
+                    height: 24px;
+                }
+
+                .top-bar.collapsed .noborder-focus {
+                    width: 20px; /* 收起狀態 */
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                }
+
+            .top-bar h2 {
+                align-items: center;
+                font-size: 1.5em;
+                width: 200px;
+                height: 24px;
+                transition: width 0.6s ease; /* 收起/展開有動畫 */
+            }
+
+            .top-bar div {
+                display: flex;
+                width: 200px;
+                white-space: nowrap;
+                align-items: center; /* 垂直置中 */
+                transition: width 0.6s ease; /* 收起/展開有動畫 */
+            }
+
+            .top-bar button {
+                /* 這裡放你要的效果 */
+                white-space: nowrap;
+                background: rgba(255,255,255,0.2); /* 半透明 */
+                border: 1px solid rgba(0,0,0,0.2);
+                color: #333;
+                width: 200px;
+                height: 24px;
+            }
+
+                .top-bar button:hover {
+                    background: rgba(0,0,255,0.2); /* 滑鼠移上去更亮 */
+                }
+
+                .top-bar button:active {
+                    background: rgba(0,0,255,0.3); /* 顏色更深 */
+                    transform: translateY(1px); /* 按下去往下移 */
+                    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); /* 壓下去的陰影 */
+                }
+
+            .top-bar.hidden {
+                width: 0px;
+                visibility: hidden;
+            }
+
+        input:disabled::placeholder {
+            color: rgba(0,0,0,0.2); /* placeholder 也變更淡 */
+        }
+
+        .title1 {
+            background: rgba(0,0,255,0.6);
+            color: white;
+            text-align: center;
+            width: 200px;
+            height: 24px;
+            line-height: 24px;
+            transition: width 0.6s ease; /* 收起/展開有動畫 */
+        }
+
+        .span1 {
+            width: 180px;
+            height: 24px;
+            line-height: 24px;
+            display: inline-block;
+            align-items: center;
+        }
+
+        .div_icon {
+            width: 19px;
+            height: 19px;
+            vertical-align: middle;
+        }
+
+        /* fps 那行的滑動效果 */
+        #fps-container {
+            transition: transform width 0.6s ease;
+        }
+
+        /* 收起時往上貼近 kbps 那行 */
+        .top-bar.collapsed #fps-container {
+            width: 60px;
+            height: auto;
+            
+        }
+
+        .noborder-focus {
+            width: 158px;
+            transition: width 0.6s ease; /* 收起/展開有動畫 */
+        }
+
+            .noborder-focus:focus {
+                outline: none !important;
+                box-shadow: none !important;
+            }
+
+        /* 動畫按鈕 小 */
+        .toggleable-btn {
+            display: flex;
+            width: 100px;
+            height: 24px;
+            align-items: center;
+            justify-content: space-between; /* 讓 icon 靠左、文字靠右 */
+            transition: width 0.6s ease; /* 按鈕自身也能有動畫 */
+        }
+
+            .toggleable-btn.active {
+                background: rgba(0,0,255,0.2); /* 你想要的顏色，可以改 */
+                color: blue; /* 文字變白，視覺更明顯 */
+                border-color: red;
+            }
+
+            .toggleable-btn .btn-text {
+                display: inline-block;
+                transform: scaleX(1);
+                transform-origin: left;
+                transition: transform 0.6s ease, opacity 0.5s ease;
+                opacity: 1;
+            }
+
+        .collapsed .toggleable-btn {
+            width: 30px;
+        }
+
+            .collapsed .toggleable-btn .btn-text {
+                transform: scaleX(0);
+                opacity: 0;
+            }
+
+        /* 動畫按鈕 小 無按鈕功能*/
+        .toggleable-btnN {
+            display: flex;
+            width: 100px;
+            height: 24px;
+            align-items: center;
+            justify-content: space-between; /* 讓 icon 靠左、文字靠右 */
+            transition: width 0.6s ease; /* 按鈕自身也能有動畫 */
+            pointer-events: none; /* 不能點擊 */
+        }
+
+            .toggleable-btnN.active {
+                background: rgba(0,0,255,0.2); /* 你想要的顏色，可以改 */
+                color: blue; /* 文字變白，視覺更明顯 */
+                border-color: red;
+            }
+
+            .toggleable-btnN .btn-textN {
+                display: inline-block;
+                transform: scaleX(1);
+                transform-origin: left;
+                transition: transform 0.6s ease, opacity 0.5s ease;
+                opacity: 1;
+                font-weight: bold;
+            }
+
+            .toggleable-btnN .btn-textN.active {
+                color: #64B4FF;
+                font-weight: bold;
+            }
+
+        .collapsed .toggleable-btnN {
+            width: 30px;
+        }
+
+            .collapsed .toggleable-btnN .btn-textN {
+                transform: scaleX(0);
+                opacity: 0;
+            }
+
+        /* 動畫按鈕 大 */
+        .toggleable-btnB {
+            display: flex;
+            width: 200px;
+            height: 24px;
+            align-items: center;
+            justify-content: center; /* 整體內容置中 */
+            position: relative; /* 讓圖示用絕對定位 */
+            transition: width 0.6s ease; /* 按鈕自身也能有動畫 */
+        }
+
+            .toggleable-btnB.active {
+                background: rgba(0,0,255,0.2); /* 你想要的顏色，可以改 */
+                color: blue; /* 文字變白，視覺更明顯 */
+                border-color: red;
+            }
+
+            .toggleable-btnB .btn-icon {
+                position: absolute;
+                left: 6px; /* 距離左邊 8px */
+                display: flex;
+                justify-content: center;
+            }
+
+            .toggleable-btnB .btn-text {
+                flex: none;
+                text-align: center;
+                transition: transform 0.6s ease, opacity 0.5s ease;
+                opacity: 1;
+            }
+
+        .collapsed .toggleable-btnB {
+            width: 60px;
+        }
+
+            .collapsed .toggleable-btnB .btn-icon {
+                left: 19px; /* 距離左邊 8px */
+            }
+
+            .collapsed .toggleable-btnB .btn-text {
+                transform: scaleX(0);
+                opacity: 0;
+            }
+
+        .chart1 {
+            width: 196px;
+            height: 100px;
+            opacity: 1;
+            transition: opacity 0.6s ease;
+        }
+
+        .collapsed .chart1 {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .sendButton {
+            width: 30px !important;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            display: flex;
+            justify-content: center; /* 水平置中 */
+            align-items: center; /* 垂直置中 */
+            padding: 0 0px;
+            font-size: 12px;
+        }
+
+        body {
+            font-family: sans-serif;
+            font-size: 14px; /* 全站文字預設 14px */
+            width: 100vw;
+            height: 100vh;
+            margin: 0; /* 關掉瀏覽器預設的 8px 外距 */
+            padding: 0; /* 若想保險可以一起歸零 */
+            box-sizing: border-box;
+            overflow: hidden; /* 禁止出現 scroll bar */
+            /* border: 1px solid black; */
+        }
+
+        /* Video */
+        .video-parent {
+            flex: 1;
+            background: white;
+            /* height: calc(var(--vh, 1vh) * 100 - 4px); */ /* 真正可用高度 */
+            min-width: 0;
+        }
+
+        video {
+            border: 0px solid black;
+            transition: all 0.3s ease;
+        }
+
+        /* 全螢幕樣式 */
+        .video-wrap {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            height: 100%;
+            background: #f6f2f2;
+        }
+
+            .video-wrap:fullscreen,
+            .video-wrap:-webkit-full-screen {
+                margin: 0;
+                display: flex;
+                background: #000;
+                justify-content: center;
+                align-items: center;
+            }
+
+                .video-wrap:fullscreen video,
+                .video-wrap:-webkit-full-screen video {
+                    width: 100%;
+                    height: auto;
+                    background: #000;
+                }
+
+        /* 紅點閃爍動畫 */
+        .record-dot {
+            display: flex;
+            width: 10px;
+            height: 10px;
+            margin-left: 3px;
+            border-radius: 50%;
+            background-color: red;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50%, 100% {
+                opacity: 1;
+            }
+
+            25%, 75% {
+                opacity: 0;
+            }
+        }
+
+        /* 鍵盤區塊 */
+        .keyboard-wrapper {
+            display: flex;
+            width: auto; /* 限制和 video 一樣寬 */
+            height: auto;
+            overflow-x: hidden; /* 避免溢出 */
+            justify-content: center;
+            background: #ddd;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.3);
+            border: 2px solid #999;
+            transform: translateY(100%);
+            opacity: 0;
+            transition: transform 0.6s ease, opacity 0.4s ease;
+            z-index: 200;
+        }
+
+            .keyboard-wrapper.show {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+        #virtualKeyboard {
+            position: relative; /* 不要用 fixed */
+            width: auto; /* 跟隨 video-wrap 寬度 */
+            background: #ddd;
+            padding: 0px;
+            gap: 20px;
+            font-family: monospace;
+            display: none; /* 預設隱藏 */
+            justify-content: flex-start;
+            align-items: flex-start;
+            transform-origin: center top; /* 從左上角縮放 */
+            outline: none;
+            margin-top: 3px;
+        }
+
+            #virtualKeyboard.show {
+                display: flex; /* 顯示 */
+            }
+
+        .kb-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .kb-numpad {
+            justify-content: center;
+            flex-direction: row;
+            display: flex;
+            gap: 4px; /* numpad 左右兩塊之間的距離比較小 */
+        }
+
+        .vk-row {
+            display: flex;
+            gap: 4px;
+            justify-content: flex-start;
+        }
+
+        .vk-key {
+            /*padding: 10px;*/
+            width: 48px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            background: white;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none; /* 禁止文字選取 */
+            -webkit-touch-callout: none; /* 禁止長按選單 */
+        }
+
+            .vk-key.active {
+                background: #bbb; /* touch時模擬active效果 */
+            }
+
+            .vk-key:active {
+                background: #bbb;
+            }
+
+        /* 特殊寬度 */
+        .tab {
+            min-width: 69px;
+        }
+
+        .caps {
+            min-width: 84px;
+        }
+
+        .bslash {
+            min-width: 69px;
+        }
+
+        .bspace {
+            min-width: 90px;
+        }
+
+        .alt {
+            min-width: 60px;
+        }
+
+        .space {
+            min-width: 312px;
+        }
+
+        .shiftL {
+            min-width: 116px;
+        }
+
+        .shiftR {
+            min-width: 130px;
+        }
+
+        .enterL {
+            min-width: 108px;
+        }
+
+        .num0 {
+            min-width: 102px;
+        }
+
+        .enterR {
+            min-height: 86px;
+        }
+
+        /* --- keyboard LEDs --- */
+        .kbd-led {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            border-radius: 8px;
+            background: #f6f7f9;
+            border: 1px solid #e5e7eb;
+            line-height: 40px;
+            padding: 0px 10px;
+        }
+
+            .kbd-led .lamp {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                display: inline-block;
+                background: #c7cbd1; /* off: 淡灰 */
+                box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
+            }
+
+                .kbd-led .lamp.on {
+                    background: #1ec97f; /* on: 綠 */
+                    box-shadow: 0 0 6px rgba(30,201,127,.6);
+                }
+
+            .kbd-led .label {
+                font-size: 12px;
+                color: #374151;
+            }
+        
+        /* 虛擬遙控器 */
+        .remote-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 0px;
+            background: #000;
+            border: 2px solid #999;
+            border-radius: 8px;
+        }
+
+        .remote-row {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .remote-btn {
+            width: 48px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            background: white;
+            border: 1px solid #aaa;
+            border-radius: 6px;
+            cursor: pointer;
+            user-select: none;
+        }
+            .remote-btn:active {
+                background: #bbb;
+            }
+
+        /* 設定頁 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+        }
+
+        /* 連線異常 */
+        #video-black-overlay {
+            position: absolute;
+            inset: 0;
+            background: #000;
+            opacity: 0; /* 預設透明 */
+            visibility: hidden; /* 不可見，避免可聚焦 */
+            transition: opacity 250ms ease, visibility 0s linear 250ms;
+            pointer-events: none; /* 不擋操作 */
+        }
+
+            /* 顯示黑幕（開始淡入） */
+            #video-black-overlay.show {
+                opacity: 1;
+                visibility: visible; /* 立即可見 */
+                transition: opacity 250ms ease, visibility 0s linear 0s;
+            }
+
+        /* Modal（同理，不用 display 切） */
+        #conn-error-modal {
+            position: absolute;
+            inset: 0;
+            display: flex; /* 讓 layout 固定 */
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 200ms ease, visibility 0s linear 200ms;
+        }
+
+            #conn-error-modal.show {
+                opacity: 1;
+                visibility: visible;
+                transition: opacity 200ms ease, visibility 0s linear 0s;
+            }
+
+        .modal-content {
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            text-align: center;
+            width: 400px;
+        }
+            .modal-content h3 {
+                text-align: center; /* 標題繼續置中 */
+            }
+        #conn-error-msg {
+            text-align: left; /* 內容靠左 */
+        }
+
+        /* 設定 modal 內容為垂直列表 */
+        #serial-modal .modal-content {
+            width: 420px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* 標籤 + 控制項的容器 */
+        .serial-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        /* 左邊標籤 */
+        .serial-label {
+            font-size: 15px;
+            width: 160px; /* 固定欄寬 → 對齊整齊 */
+            text-align: left;
+        }
+
+        /* 右邊下拉選單 / 按鈕 */
+        .serial-input {
+            flex-grow: 1;
+            text-align: right;
+        }
+
+            .serial-input select,
+            .serial-input button {
+                min-width: 160px;
+            }
+
+            /* 讓選單寬度一致 */
+            .serial-input select {
+                padding: 4px;
+            }
+
+        .serial-input-left {
+            flex-grow: 1;
+            text-align: left;
+        }
+
+        /* 分隔線美化 */
+        #serial-modal hr {
+            margin: 15px 0;
+        }
+
+        .chart-container {
+            width: 196px !important;
+            border: 2px solid #64B4FF;
+            border-radius: 4px;
+            background: #f7f7f7; /* 預設灰色 */
+
+            flex-direction: column; /* 🔥改成垂直排列 */
+            align-items: center; /* 置中 */
+            gap: 4px; /* 上下距離 */
+        }
+
+        /* 連線 keyboard mouse 狀態指示*/
+        .usbstatus-container {
+            display: flex;
+            width: 196px !important;
+            height: 24px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            background: #f7f7f7; /* 預設灰色 */
+        }
+
+            /* 藍色模式 */
+            .usbstatus-container.active {
+                background: #f7f7f7; /* 預設灰色 */
+                border-color: #64B4FF;
+            }
+
+        /* 子項目（Keyboard / Mouse 共用） */
+        .usbstatus_item {
+            flex: 1;
+            text-align: center;
+            padding: 8px 0;
+            font-size: 12px;
+            color: #000000; /* 預設文字顏色 */
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+            /* 子項目 Active（藍色框時，或文字要反白時） */
+            .usbstatus_item.active {
+                color: #64B4FF;
+                font-weight: bold;
+            }
+
+        /*懸浮按鈕*/
+        .floating-btn {
+            position: fixed;
+            right: 10px;
+            top: 10px;
+            width: 20px;
+            height: 20px;
+            border: none;
+            display: none; /* 預設隱藏 */
+            justify-content: center;
+            align-items: center;
+            cursor: grab;
+            z-index: 99999;
+            user-select: none; /* 拖曳時避免選到文字 */
+        }
+
+            .floating-btn:active {
+                cursor: grabbing;
+                background: rgba(0,0,0,0.6);
+            }
+
+        /* === Hotkey Recording Modal === */
+        .hotkey-mask {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 100%;
+            height: 500px;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 8000; /* 高於 video, 低於 keyboard */
+        }
+
+            .hotkey-mask.show {
+                display: flex;
+            }
+
+        .hotkey-mask-text {
+            color: #FF0000;
+            font-size: 32px;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(0,0,0,0.5);
+        }
+    </style>
+
+    <script src="chart.js"></script>
+    <script type="module" src="main.o.js"></script>
+</head>
+
+<body>
+    <div id="id_div_main" class="div-main">
+        <div id="id_div_videoP" class="video-parent">
+            <div id="videoBox" class="video-wrap">
+                <audio id="id_audio" autoplay></audio>
+                <video id="stream" style="margin-top: 0; display: block; transform: none; filter: none;" tabindex="0" autoplay playsinline>Your browser doesn't support video</video>
+                <div id="video-black-overlay"></div>
+                <!-- 虛擬鍵盤 UI -->
+                <div class="keyboard-wrapper">
+                    <div id="virtualKeyboard" tabindex="0">
+                        <!-- 主鍵區 -->
+                        <div class="kb-block">
+                            <div class="vk-row">
+                                <div class="vk-key" data-code="Escape">Esc</div>
+                                <div style="margin-left:48px"></div>
+                                <div class="vk-key" data-code="F1">F1</div>
+                                <div class="vk-key" data-code="F2">F2</div>
+                                <div class="vk-key" data-code="F3">F3</div>
+                                <div class="vk-key" data-code="F4">F4</div>
+                                <div style="margin-left:18px"></div>
+                                <div class="vk-key" data-code="F5">F5</div>
+                                <div class="vk-key" data-code="F6">F6</div>
+                                <div class="vk-key" data-code="F7">F7</div>
+                                <div class="vk-key" data-code="F8">F8</div>
+                                <div style="margin-left:18px"></div>
+                                <div class="vk-key" data-code="F9">F9</div>
+                                <div class="vk-key" data-code="F10">F10</div>
+                                <div class="vk-key" data-code="F11">F11</div>
+                                <div class="vk-key" data-code="F12">F12</div>
+                            </div>
+                            <div class="vk-row">
+                                <div class="vk-key" data-code="Backquote">~</div>
+                                <div class="vk-key" data-code="Digit1">1</div>
+                                <div class="vk-key" data-code="Digit2">2</div>
+                                <div class="vk-key" data-code="Digit3">3</div>
+                                <div class="vk-key" data-code="Digit4">4</div>
+                                <div class="vk-key" data-code="Digit5">5</div>
+                                <div class="vk-key" data-code="Digit6">6</div>
+                                <div class="vk-key" data-code="Digit7">7</div>
+                                <div class="vk-key" data-code="Digit8">8</div>
+                                <div class="vk-key" data-code="Digit9">9</div>
+                                <div class="vk-key" data-code="Digit0">0</div>
+                                <div class="vk-key" data-code="Minus">-</div>
+                                <div class="vk-key" data-code="Equal">=</div>
+                                <div class="vk-key bspace" data-code="Backspace">Backspace</div>
+                            </div>
+                            <div class="vk-row">
+                                <div class="vk-key tab" data-code="Tab">Tab</div>
+                                <div class="vk-key" data-code="KeyQ">Q</div>
+                                <div class="vk-key" data-code="KeyW">W</div>
+                                <div class="vk-key" data-code="KeyE">E</div>
+                                <div class="vk-key" data-code="KeyR">R</div>
+                                <div class="vk-key" data-code="KeyT">T</div>
+                                <div class="vk-key" data-code="KeyY">Y</div>
+                                <div class="vk-key" data-code="KeyU">U</div>
+                                <div class="vk-key" data-code="KeyI">I</div>
+                                <div class="vk-key" data-code="KeyO">O</div>
+                                <div class="vk-key" data-code="KeyP">P</div>
+                                <div class="vk-key" data-code="BracketLeft">[</div>
+                                <div class="vk-key" data-code="BracketRight">]</div>
+                                <div class="vk-key bslash" data-code="Backslash">\</div>
+                            </div>
+                            <div class="vk-row">
+                                <div class="vk-key caps" data-code="CapsLock">Caps</div>
+                                <div class="vk-key" data-code="KeyA">A</div>
+                                <div class="vk-key" data-code="KeyS">S</div>
+                                <div class="vk-key" data-code="KeyD">D</div>
+                                <div class="vk-key" data-code="KeyF">F</div>
+                                <div class="vk-key" data-code="KeyG">G</div>
+                                <div class="vk-key" data-code="KeyH">H</div>
+                                <div class="vk-key" data-code="KeyJ">J</div>
+                                <div class="vk-key" data-code="KeyK">K</div>
+                                <div class="vk-key" data-code="KeyL">L</div>
+                                <div class="vk-key" data-code="Semicolon">;</div>
+                                <div class="vk-key" data-code="Quote">'</div>
+                                <div class="vk-key enterL" data-code="Enter">Enter</div>
+                            </div>
+                            <div class="vk-row">
+                                <div class="vk-key shiftL" data-code="ShiftLeft">Shift</div>
+                                <div class="vk-key" data-code="KeyZ">Z</div>
+                                <div class="vk-key" data-code="KeyX">X</div>
+                                <div class="vk-key" data-code="KeyC">C</div>
+                                <div class="vk-key" data-code="KeyV">V</div>
+                                <div class="vk-key" data-code="KeyB">B</div>
+                                <div class="vk-key" data-code="KeyN">N</div>
+                                <div class="vk-key" data-code="KeyM">M</div>
+                                <div class="vk-key" data-code="Comma">,</div>
+                                <div class="vk-key" data-code="Period">.</div>
+                                <div class="vk-key" data-code="Slash">/</div>
+                                <div class="vk-key shiftR" data-code="ShiftRight">Shift</div>
+                            </div>
+                            <div class="vk-row">
+                                <div class="vk-key tab" data-code="ControlLeft">Ctrl</div>
+                                <div class="vk-key alt" data-code="MetaLeft">Win</div>
+                                <div class="vk-key alt" data-code="AltLeft">Alt</div>
+                                <div class="vk-key space" data-code="Space">Space</div>
+                                <div class="vk-key alt" data-code="AltRight">Alt</div>
+                                <div class="vk-key alt" data-code="MetaRight">Win</div>
+                                <div class="vk-key alt" data-code="ContextMenu">Menu</div>
+                                <div class="vk-key tab" data-code="ControlRight">Ctrl</div>
+                            </div>
+                        </div>
+
+                        <!-- 編輯鍵 + 方向鍵 -->
+                        <div class="kb-block">
+                            <div class="vk-row">
+                                <div class="vk-key" data-code="PrintScreen">PrtSc</div>
+                                <div class="vk-key" data-code="ScrollLock">ScrLk</div>
+                                <div class="vk-key" data-code="Pause">Pause</div>
+                            </div>
+                            <div class="vk-row">
+                                <div class="vk-key" data-code="Insert">Ins</div>
+                                <div class="vk-key" data-code="Home">Home</div>
+                                <div class="vk-key" data-code="PageUp">PgUp</div>
+                            </div>
+                            <div class="vk-row">
+                                <div class="vk-key" data-code="Delete">Del</div>
+                                <div class="vk-key" data-code="End">End</div>
+                                <div class="vk-key" data-code="PageDown">PgDn</div>
+                            </div>
+                            <div class="vk-row">
+                                <div class="vk-key" style="visibility:hidden">x</div>
+                            </div>
+                            <div class="vk-row">
+                                <div class="vk-key" style="visibility:hidden">x</div>
+                                <div class="vk-key" data-code="ArrowUp">↑</div>
+                                <div class="vk-key" style="visibility:hidden">x</div>
+                            </div>
+                            <div class="vk-row">
+                                <div class="vk-key" data-code="ArrowLeft">←</div>
+                                <div class="vk-key" data-code="ArrowDown">↓</div>
+                                <div class="vk-key" data-code="ArrowRight">→</div>
+                            </div>
+                        </div>
+
+                        <!-- 數字小鍵盤 -->
+                        <div class="kb-block">
+                            <!-- 左半 numpad -->
+                            <div class="kb-numpad">
+                                <!-- 上半：LED 區 -->
+                                <div class="kbd-led"><span class="lamp" id="led-num"></span>Num</div>
+                                <div class="kbd-led"><span class="lamp" id="led-caps"></span>Caps</div>
+                                <div class="kbd-led"><span class="lamp" id="led-scroll"></span>Scroll</div>
+                            </div>
+
+                            <div class="kb-numpad">
+                                <div class="kb-block">
+                                    <div class="vk-row">
+                                        <div class="vk-key" data-code="NumLock">Num</div>
+                                        <div class="vk-key" data-code="NumpadDivide">/</div>
+                                        <div class="vk-key" data-code="NumpadMultiply">*</div>
+                                    </div>
+                                    <div class="vk-row">
+                                        <div class="vk-key" data-code="Numpad7">7</div>
+                                        <div class="vk-key" data-code="Numpad8">8</div>
+                                        <div class="vk-key" data-code="Numpad9">9</div>
+                                    </div>
+                                    <div class="vk-row">
+                                        <div class="vk-key" data-code="Numpad4">4</div>
+                                        <div class="vk-key" data-code="Numpad5">5</div>
+                                        <div class="vk-key" data-code="Numpad6">6</div>
+                                    </div>
+                                    <div class="vk-row">
+                                        <div class="vk-key" data-code="Numpad1">1</div>
+                                        <div class="vk-key" data-code="Numpad2">2</div>
+                                        <div class="vk-key" data-code="Numpad3">3</div>
+                                    </div>
+                                    <div class="vk-row">
+                                        <div class="vk-key num0" data-code="Numpad0">0</div>
+                                        <div class="vk-key" data-code="NumpadDecimal">.</div>
+                                    </div>
+                                </div>
+
+                                <div class="kb-block">
+                                    <div class="vk-row">
+                                        <div class="vk-key" data-code="NumpadSubtract">-</div>
+                                    </div>
+                                    <div class="vk-row">
+                                        <div class="vk-key enterR" data-code="NumpadAdd">+</div>
+                                    </div>
+                                    <div class="vk-row">
+                                        <div class="vk-key enterR" data-code="NumpadEnter">Enter</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="virtualRemote" class="remote-wrapper">
+                            <div class="remote-row">
+                                <div class="remote-btn" data-usage="0x30"><img src="icon/power.png" alt="power" class="div_icon"></div>
+                                <div class="vk-key" data-code="ArrowUp">▲</div>
+                                <div class="remote-btn" data-usage="0x1B6">test</div>
+                            </div>
+                            <div class="remote-row">
+                                <div class="vk-key" data-code="ArrowLeft">⯇</div>
+                                <div class="vk-key" data-code="Enter">OK</div>
+                                <div class="vk-key" data-code="ArrowRight">⯈</div>
+                            </div>
+                            <div class="remote-row">
+                                <div class="remote-btn" data-usage="0x0008">🏠</div>
+                                <div class="vk-key" data-code="ArrowDown">▼</div>
+                                <div class="remote-btn" data-usage="0x0010"><img src="icon/back.png" alt="back" class="div_icon"></div>
+                            </div>
+                            <div class="remote-row">
+                                <div class="vk-key" style="visibility:hidden">x</div>
+                            </div>
+                            <div class="remote-row">
+                                <div class="remote-btn" data-usage="0x2000">⏮️</div>
+                                <div class="remote-btn" data-usage="0x0800">⏯️</div>
+                                <div class="remote-btn" data-usage="0x1000">⏭️</div>
+                            </div>
+                            <div class="remote-row">
+                                <div class="remote-btn" data-usage="0x0200">🔉</div>
+                                <div class="remote-btn" data-usage="0x0400">🔇</div>
+                                <div class="remote-btn" data-usage="0x0100">🔊</div>
+                            </div>
+                        </div>
+                        <div class="kb-block">
+                            <div class="vk-row" id="id_div_hotkeyBlock" style="display:none; width: 162px; margin-top:0px; justify-content:right;">
+                                <button id="hotkeyConfirmBtn">儲存</button>
+                                <button id="hotkeyCancelBtn">取消</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 虛擬鍵盤 UI end-->
+                </div>
+            </div>
+        </div>
+
+        <div class="top-bar-wrapper">
+            <div id="t-b" class="top-bar">
+                <!-- ==========LOGO========== -->
+                <div style="height: 32px !important">
+                    <h2 id="topbarTitle" align="center" style="text-align: center">j5create</h2>
+                </div>
+
+                <!-- ==========按鈕========== -->
+                <div>
+                    <button id="toggleTopbarBtn" class="toggleable-btn">
+                        <span class="btn-icon"><img src="icon/topbar.png" alt="collapsed" class="div_icon"></span>
+                        <span class="btn-text">收合</span>
+                    </button>
+                    <button id="id_button_hideTopbar" class="toggleable-btn">
+                        <span class="btn-icon"><img src="icon/option.png" alt="hide" class="div_icon"></span>
+                        <span class="btn-text">隱藏</span>
+                    </button>
+                </div>
+                <div>
+                    <button id="openSettingsBtn" class="toggleable-btnB">
+                        <span class="btn-icon"><img src="icon/settings.png" alt="settings" class="div_icon"></span>
+                        <span class="btn-text">設定</span>
+                    </button>
+                </div>
+
+                <!-- ==========視窗========== -->
+                <div><span class="title1">視窗</span></div>
+                <div>
+                    <button id="pip-button" class="toggleable-btn">
+                        <span class="btn-icon"><img src="icon/copy.png" alt="pip" class="div_icon"></span>
+                        <span class="btn-text">浮動視窗</span>
+                    </button>
+                    <button id="fullscreen-btn" class="toggleable-btn">
+                        <span class="btn-icon"><img src="icon/fullscreen.png" alt="fullscreen" class="div_icon"></span>
+                        <span class="btn-text">全螢幕</span>
+                    </button>
+                </div>
+                <div>
+                    <button id="snapshot-btn" class="toggleable-btn">
+                        <span class="btn-icon"><img src="icon/snapshot.png" alt="snapshot" class="div_icon"></span>
+                        <span class="btn-text">螢幕截圖</span>
+                    </button>
+                    <button id="record-btn" class="toggleable-btn">
+                        <span class="btn-icon" id="id_span_record_icon"><img src="icon/record.png" alt="record" class="div_icon"></span>
+                        <span class="btn-text">螢幕錄影</span>
+                    </button>
+                </div>
+
+                <!-- ==========剪貼簿========== -->
+                <div><span class="title1">剪貼簿</span></div>
+                <div style="gap: 3px;">
+                    <button class="sendButton" id="sendKeyboardBtn1"><img src="icon/enter.png" alt="enter" class="div_icon">1</button>
+                    <input type="text" id="id_text_clipboard1" class="noborder-focus">
+                </div>
+                <div style="gap: 3px;">
+                    <button class="sendButton" id="sendKeyboardBtn2"><img src="icon/enter.png" alt="enter" class="div_icon">2</button>
+                    <input type="text" id="id_text_clipboard2" class="noborder-focus">
+                </div>
+                <div style="gap: 3px;">
+                    <button class="sendButton" id="sendKeyboardBtn3"><img src="icon/enter.png" alt="enter" class="div_icon">3</button>
+                    <input type="text" id="id_text_clipboard3" class="noborder-focus">
+                </div>
+                <button id="sendClipboardBtn" class="toggleable-btnB">
+                    <span class="btn-icon"><img src="icon/enter.png" alt="enter" class="div_icon"></span>
+                    <span class="btn-text">送出剪貼簿</span>
+                </button>
+
+                <!-- ==========熱鍵========== -->
+                <div><span class="title1">熱鍵</span></div>
+                <button id="toggleKeyboardBtn" class="toggleable-btnB">
+                    <span class="btn-icon"><img src="icon/keyboard.png" alt="keyboard" class="div_icon"></span>
+                    <span class="btn-text">虛擬鍵盤</span>
+                </button>
+                <div style="gap: 3px;">
+                    <button class="sendButton" id="id_btn_sendHotkey1"><img src="icon/enter.png" alt="enter" class="div_icon">1</button>
+                    <input type="text" id="id_text_sendHotkey1" class="noborder-focus" readonly>
+                </div>
+                <div style="gap: 3px;">
+                    <button class="sendButton" id="id_btn_sendHotkey2"><img src="icon/enter.png" alt="enter" class="div_icon">2</button>
+                    <input type="text" id="id_text_sendHotkey2" class="noborder-focus" readonly>
+                </div>
+                <div style="gap: 3px;">
+                    <button class="sendButton" id="id_btn_sendHotkey3"><img src="icon/enter.png" alt="enter" class="div_icon">3</button>
+                    <input type="text" id="id_text_sendHotkey3" class="noborder-focus" readonly>
+                </div>
+
+                <!-- ==========滑鼠========== -->
+                <div><span class="title1">滑鼠</span></div>
+                <div>
+                    <button id="lockMouse-btn" class="toggleable-btn">
+                        <span class="btn-icon"><img src="icon/relative.png" alt="relative" class="div_icon"></span>
+                        <span class="btn-text">相對座標</span>
+                    </button>
+                    <button id="autoMouse-btn" class="toggleable-btn">
+                        <span class="btn-icon"><img src="icon/jitter.png" alt="jitter" class="div_icon"></span>
+                        <span class="btn-text">滑鼠抖動</span>
+                    </button>
+                </div>
+
+                <!-- ==========連線資訊========== -->
+                <div><span class="title1">狀態</span></div>
+                <div>
+                    <button class="toggleable-btnB" id="id_button_mute">
+                        <span class="btn-icon" id="id_span_mute"><img src="icon/unmute.png" alt="mute" class="div_icon"></span>
+                        <span class="btn-text">聲音</span>
+                    </button>
+                </div>
+                <div>
+                    <div class="usbstatus-container" id="id_div_usbstatus">
+                        <button class="toggleable-btnN" disabled>
+                            <span class="btn-icon" id="id_span_keyboard_icon"><img src="icon/keyboard_dark.png" alt="keyboard" class="div_icon"></span>
+                            <span class="btn-textN" id="id_span_keyboard_status">鍵盤</span>
+                        </button>
+                        <button class="toggleable-btnN">
+                            <span class="btn-icon" id="id_span_mouse_icon"><img src="icon/mouse_dark.png" alt="mouse" class="div_icon"></span>
+                            <span class="btn-textN" id="id_span_mouse_status">滑鼠</span>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <div class="chart-container">
+                        <div id="fps-container">
+                            <span id="id_span_fps" class="span1" style="color: rgb(75, 192, 192); font-family: Consolas; font-weight: bold;">0 fps</span>
+                        </div>
+                        <div style="width: 196px !important; height: 100px;">
+                            <canvas class="chart1" id="id_chart_fpsRender"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="hotkey-video-mask" class="hotkey-mask">
+            <div class="hotkey-mask-text">🎹 錄製熱鍵中…</div>
+        </div>
+
+        <button id="id_button_showTopbar" class="floating-btn"><img src="icon/option.png" alt="show" class="div_icon"></button>
+    </div>
+
+    <!-- 連線異常頁面 -->
+    <div id="conn-error-modal">
+        <div class="modal-content">
+            <h3>⚠️ 連線異常</h3>
+            <p id="conn-error-msg"></p>
+        </div>
+    </div>
+
+    <!-- 序列埠選擇頁面（進入網頁一定會先看到） -->
+    <div id="serial-modal" class="modal" tabindex="0">
+        <div class="modal-content">
+            <h3>🔌 裝置選擇與設定</h3>
+
+            <!-- COM -->
+            <div class="serial-row">
+                <div class="serial-input-left">
+                    <button id="btn-choose-port">選擇 COM 裝置</button>
+                </div>
+                <div class="serial-input">
+                    <p id="serial-status" style="margin:0;">請按「選擇 COM 裝置」。</p>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- UVC -->
+            <div class="serial-row">
+                <div class="serial-label">影像來源</div>
+                <div class="serial-input">
+                    <select id="selCam"></select>
+                </div>
+            </div>
+
+            <div class="serial-row">
+                <div class="serial-label">解析度</div>
+                <div class="serial-input">
+                    <select id="selResolution"></select>
+                </div>
+            </div>
+
+            <div class="serial-row">
+                <div class="serial-label">Framerate</div>
+                <div class="serial-input">
+                    <select id="selFramerate"></select>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- UAC -->
+            <div class="serial-row">
+                <div class="serial-label">聲音來源</div>
+                <div class="serial-input">
+                    <select id="selAudio"></select>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Scroll speed -->
+            <div class="serial-row">
+                <div class="serial-label">Scroll Speed</div>
+                <div class="serial-input">
+                    <select id="id_select_scrollspeed">
+                        <option value="1" selected>1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Direction -->
+            <div class="serial-row">
+                <div class="serial-label">Scroll Direction</div>
+                <div class="serial-input">
+                    <select id="id_select_direction">
+                        <option value="-1" selected>Normal</option>
+                        <option value="1">Reverse</option>
+                    </select>
+                </div>
+            </div>
+
+            <br>
+
+            <!-- Confirm -->
+            <div style="text-align:right;">
+                <button id="btn-apply-settings" style="padding:8px 18px;">
+                    ✔ 確定
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
