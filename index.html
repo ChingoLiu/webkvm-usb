@@ -275,11 +275,58 @@
             height: 26px;
             line-height: 24px;
             text-align: center;
+            position: relative; /* 🔸 讓 ::before 能相對定位 */
+            overflow: visible; /* 環可以畫在外面一點 */
         }
 
+            /* hover 一樣保留 */
             .sendButton:hover {
                 background: var(--btn-bg-hover);
             }
+
+            /* repeat 模式時維持你原本的 active 視覺 */
+            .sendButton.active {
+                box-shadow: 0 0 0 2px rgba(255, 143, 73, 0.6);
+            }
+
+        /* 定義可動畫的角度變數 */
+        @property --charge-angle {
+            syntax: '<angle>';
+            inherits: false;
+            initial-value: 0deg;
+        }
+
+        /* 外圈「進度環」 */
+        .sendButton::before {
+            content: "";
+            position: absolute;
+            inset: -1px; /* 比按鈕大一圈 */
+            border-radius: 999px;
+            pointer-events: none;
+            opacity: 0;
+            /* 用 conic-gradient 畫出一段圓環，再用 mask 中空中間 */
+            background: conic-gradient( var(--btn-accent, #ff8f49) 0deg var(--charge-angle), transparent var(--charge-angle) 360deg );
+            -webkit-mask: radial-gradient( farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px) );
+            mask: radial-gradient( farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px) );
+            transition: opacity 0.15s ease;
+        }
+
+        /* 按住 3 秒充能動畫 */
+        .sendButton.charging::before {
+            opacity: 1;
+            animation: hotkey-charge 2s linear forwards;
+        }
+
+        /* 充能角度從 0 → 360 度 */
+        @keyframes hotkey-charge {
+            from {
+                --charge-angle: 0deg;
+            }
+
+            to {
+                --charge-angle: 360deg;
+            }
+        }
 
         /* 為了將textbox做成膠囊外觀 */
         .top_div_input {
@@ -1114,7 +1161,7 @@
 
                         <div id="virtualRemote" class="remote-wrapper">
                             <div class="remote-row">
-                                <div class="remote-btn" data-usage="0x30"><img data-icon-light="icon/remote_power_light.png" data-icon-dark="icon/remote_power_dark.png" alt="remote_power" class="div_icon"></div>
+                                <div class="remote-btn" data-usage="0x30"><img data-icon-light="icon/remote_power_light.png" data-icon-dark="icon/remote_power_dark.png" alt="remote_power" class="div_icon" ></div>
                                 <div class="vk-key" data-code="ArrowUp"><img data-icon-light="icon/remote_up_light.png" data-icon-dark="icon/remote_up_dark.png" alt="remote_up" class="div_icon"></div>
                                 <div class="remote-btn" data-usage="0x1B6"></div>
                             </div>
@@ -1159,8 +1206,8 @@
                                 <div class="vk-key" style="visibility:hidden">x</div>
                             </div>
                             <div class="vk-row" style="width: 162px; justify-content: right;">
-                                <button id="hotkeyCancelBtn" class="vk-key vk-key--bigger" data-i18n="vkeyboard.cancel">取消</button>
-                                <button id="hotkeyConfirmBtn" class="vk-key vk-key--bigger" data-i18n="vkeyboard.save">儲存</button>
+                                <button id="hotkeyCancelBtn" class="vk-key--bigger" data-code="" data-i18n="vkeyboard.cancel">取消</button>
+                                <button id="hotkeyConfirmBtn" class="vk-key--bigger" data-code="" data-i18n="vkeyboard.save">儲存</button>
                             </div>
                         </div>
                     </div>
