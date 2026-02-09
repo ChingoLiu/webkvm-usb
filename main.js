@@ -55,7 +55,7 @@ function createWindow() {
     });
 
     win.loadFile(path.join(__dirname, "kvim202.html"));
-    win.webContents.openDevTools({ mode: "detach" });
+    //win.webContents.openDevTools({ mode: "detach" });
 
     const ses = win.webContents.session;
 
