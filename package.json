@@ -22,7 +22,7 @@
       "chart.js",
       "preload.js",
       "kvim202.html",
-      "kvim202.js",
+      "kvim202.o.js",
       "icon/**",
       "css/**",
       "build/**"
