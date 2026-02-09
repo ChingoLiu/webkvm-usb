@@ -93,7 +93,6 @@
             justify-content: flex-end; /* 靠右對齊 */
             width: auto;
             margin-left: 3px;
-            /* border-left: 2px solid rgb(210,210,210); */
         }
 
         .top-bar {
@@ -581,8 +580,8 @@
 
                 .video-wrap:fullscreen video,
                 .video-wrap:-webkit-full-screen video {
-                    width: 100%;
-                    height: auto;
+                    width: 100% !important;
+                    height: auto !important;
                     background: var(--bg-color);
                 }
 
@@ -668,7 +667,6 @@
         }
 
         .vk-key {
-            /*padding: 10px;*/
             width: 48px;
             height: 40px;
             line-height: 40px;
@@ -808,6 +806,38 @@
                 background: var(--keyboard-bg);
             }
 
+        /* 懸浮按鈕 */
+        .floating-btn {
+            position: fixed;
+            right: 0px;
+            top: 40px;
+            width: 40px;
+            height: 40px;
+            border: none;
+            display: none; /* 預設隱藏 */
+            justify-content: center;
+            align-items: center;
+            cursor: grab;
+            z-index: 99999;
+            user-select: none; /* 拖曳時避免選到文字 */
+            background: rgba(0,0,0,0.5);
+            opacity: 0.2;
+        }
+
+            .floating-btn:active {
+                cursor: grabbing;
+                background: rgba(0,0,0,0.6);
+            }
+
+            .floating-btn:hover {
+                opacity: 0.6; /* 滑過去變全不透明 */
+            }
+
+            .floating-btn img.div_icon {
+                display: block; /* 避免 inline 元素造成小縫隙 */
+                pointer-events: none; /* 點擊只算在 button，不會打到 img */
+            }
+
         /* 設定頁 */
         .serial-setting-modal {
             display: none;
@@ -819,14 +849,17 @@
             height: 100%;
             background: var(--modal-alpha-bg);
         }
+            .serial-setting-modal * {
+                font-size: 12px !important;
+            }
 
         .serial-setting-content {
             background: var(--bg-topbar);
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             text-align: center;
-            width: 550px;
-            padding: 0px 20px 0px 20px;
+            width: 330px;
+            padding: 0px 10px 0px 10px;
             box-sizing: border-box;
             overflow-y: auto;
         }
@@ -838,7 +871,7 @@
                 display: inline-flex;
                 flex-direction: column; /* 標題一行、下面一行行排 */
                 padding: 2px 4px 2px 4px;
-                width: 208px;
+                width: 120px;
                 height: 32px;
                 justify-content: center;
                 margin-top: 6px;
@@ -871,7 +904,7 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                margin: 10px 0;
+                margin: 5px 0;
             }
 
             .serial-setting-content .serial-label {
@@ -886,7 +919,7 @@
             }
 
             .serial-setting-content select {
-                width: 360px;
+                width: 200px;
                 background: var(--bg-topbar);
                 color: var(--text-color);
                 padding: 4px;
@@ -895,35 +928,6 @@
             .serial-setting-content .serial-input-left {
                 flex-grow: 1;
                 text-align: left;
-            }
-
-        /* 懸浮按鈕 */
-        .floating-btn {
-            position: fixed;
-            right: 0px;
-            top: 40px;
-            width: 40px;
-            height: 40px;
-            border: none;
-            display: none; /* 預設隱藏 */
-            justify-content: center;
-            align-items: center;
-            cursor: grab;
-            z-index: 99999;
-            user-select: none; /* 拖曳時避免選到文字 */
-            background: rgba(0,0,0,0.5);
-            opacity: 0.2;
-        }
-            .floating-btn:active {
-                cursor: grabbing;
-                background: rgba(0,0,0,0.6);
-            }
-            .floating-btn:hover {
-                opacity: 0.6; /* 滑過去變全不透明 */
-            }
-            .floating-btn img.div_icon {
-                display: block; /* 避免 inline 元素造成小縫隙 */
-                pointer-events: none; /* 點擊只算在 button，不會打到 img */
             }
 
         /* === Hotkey Recording Modal === */
@@ -1189,6 +1193,7 @@
                                 <div class="remote-btn" data-usage="0x0100"><img data-icon-light="icon/remote_volumeUp_light.png" data-icon-dark="icon/remote_volumeUp_dark.png" alt="remote_volumeUp" class="div_icon"></div>
                             </div>
                         </div>
+
                         <div id="id_div_hotkeyBlock" class="kb-block">
                             <div class="vk-row">
                                 <div class="vk-key" style="visibility:hidden">x</div>
@@ -1242,10 +1247,7 @@
 
                 <!-- ==========視窗========== -->
                 <div class="title1-box">
-                    <!-- 上面這條標題 -->
                     <div class="title1" data-i18n="window.title">視窗</div>
-
-                    <!-- 下面是內容（按鈕） -->
                     <div>
                         <button id="pip-button" class="toggleable-btn">
                             <span class="btn-icon"><img data-icon-light="icon/pip_light.png" data-icon-dark="icon/pip_dark.png" alt="pip" class="div_icon"></span>
@@ -1267,6 +1269,7 @@
                         </button>
                     </div>
                 </div>
+
                 <!-- ==========剪貼簿========== -->
                 <div class="title1-box">
                     <div class="title1" data-i18n="clipboard.title">剪貼簿</div>
