@@ -1,0 +1,48 @@
+{
+  "name": "kvim202",
+  "version": "0.1.0",
+  "description": "KVIM202 UVC+Serial KVM",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^35.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "build": {
+    "appId": "com.kvim202.app",
+    "productName": "KVIM202",
+    "asar": true,
+    "files": [
+      "main.js",
+      "chart.js",
+      "preload.js",
+      "kvim202.html",
+      "kvim202.js",
+      "icon/**",
+      "css/**",
+      "build/**"
+    ],
+    "win": {
+      "target": [ "nsis", "portable" ],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "mac": {
+      "target": [ "dmg", "zip" ],
+      "icon": "build/icon.icns"
+    },
+    "linux": {
+      "target": [ "AppImage", "deb" ],
+      "icon": "build"
+    }
+  }
+}
+
