@@ -577,13 +577,32 @@
                 justify-content: center;
                 align-items: center;
             }
+        
+        #stream {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
 
-                .video-wrap:fullscreen video,
-                .video-wrap:-webkit-full-screen video {
-                    width: 100% !important;
-                    height: auto !important;
-                    background: var(--bg-color);
-                }
+        #stream.rot0 {
+            transform-origin: top left;
+            transform: rotate(0deg) !important;
+        }
+
+        #stream.rot90 {
+            transform-origin: top left;
+            transform: rotate(90deg) translateY(-100%)!important;
+        }
+
+        #stream.rot180 {
+            transform-origin: top left;
+            transform: rotate(180deg) translate(-100%, -100%)!important;
+        }
+
+        #stream.rot270 {
+            transform-origin: top left;
+            transform: rotate(270deg) translateX(-100%) !important;
+        }
 
         /* 紅點閃爍動畫 */
         .record-dot {
@@ -1320,10 +1339,16 @@
                         </div>
                     </div>
 
-                    <button id="toggleKeyboardBtn" class="toggleable-btnB">
-                        <span class="btn-icon"><img data-icon-light="icon/keyboard_off_light.png" data-icon-dark="icon/keyboard_off_dark.png" alt="keyboard" class="div_icon"></span>
-                        <span class="btn-text" data-i18n="hotkey.vkeyboard">虛擬鍵盤</span>
-                    </button>
+                    <div>
+                        <button id="toggleKeyboardBtn" class="toggleable-btn">
+                            <span class="btn-icon"><img data-icon-light="icon/keyboard_off_light.png" data-icon-dark="icon/keyboard_off_dark.png" alt="keyboard" class="div_icon"></span>
+                            <span class="btn-text" data-i18n="hotkey.vkeyboard">虛擬鍵盤</span>
+                        </button>
+                        <button id="toggleControlModeBtn" class="toggleable-btn">
+                            <span class="btn-icon"><img data-icon-light="icon/keyboard_off_light.png" data-icon-dark="icon/keyboard_off_dark.png" alt="keyboard" class="div_icon"></span>
+                            <span class="btn-text" data-i18n="hotkey.vcontrolmode">控制模式</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- ==========滑鼠========== -->
@@ -1424,6 +1449,18 @@
                     <div class="serial-label" data-i18n="setting.framerate">幀率</div>
                     <div class="serial-input">
                         <select id="selFramerate"></select>
+                    </div>
+                </div>
+
+                <div class="serial-row">
+                    <div class="serial-label" data-i18n="setting.rotate">旋轉</div>
+                    <div class="serial-input">
+                        <select id="selRotate">
+                            <option value="0" data-i18n="setting.rotate0">0°</option>
+                            <option value="90" data-i18n="setting.rotate90">90°</option>
+                            <option value="180" data-i18n="setting.rotate180">180°</option>
+                            <option value="270" data-i18n="setting.rotate270">270°</option>
+                        </select>
                     </div>
                 </div>
             </div>
