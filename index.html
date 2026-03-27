@@ -579,9 +579,8 @@
             }
         
         #stream {
-            position: absolute;
-            left: 0;
-            top: 0;
+            
+
         }
 
         #stream.rot0 {
@@ -627,23 +626,27 @@
 
         /* 鍵盤區塊 */
         .keyboard-wrapper {
+            position: absolute;
+            left: 0;
+            top: var(--video-visual-h, 0px);
+            transform: translateY(100%);   /* 預設藏在下方 */
+            opacity: 0;
+
             display: flex;
-            width: auto; /* 限制和 video 一樣寬 */
+            width: auto;
             height: auto;
-            overflow-x: hidden; /* 避免溢出 */
-            overflow-y: hidden;
+            overflow: hidden;
             justify-content: center;
             background: var(--keyboard-bg);
             box-shadow: 0 -4px 10px rgba(0,0,0,0.3);
             border: 2px solid #999;
-            transform: translateY(100%);
-            opacity: 0;
+
             transition: transform 0.6s ease, opacity 0.4s ease;
             z-index: 200;
-        }
+            }
 
             .keyboard-wrapper.show {
-                transform: translateY(0);
+                transform: translateY(0);      /* 滑上來 */
                 opacity: 1;
             }
 

@@ -54,7 +54,9 @@ function createWindow() {
         },
     });
 
-    win.loadFile(path.join(__dirname, "kvim202.html"));
+    win.loadFile(path.join(__dirname, "index.html"));
+
+    // ✅ 開發工具（選擇性，建議開發時打開看看 serial 權限/事件）
     //win.webContents.openDevTools({ mode: "detach" });
 
     const ses = win.webContents.session;
@@ -65,7 +67,8 @@ function createWindow() {
             permission === "media" ||
             permission === "serial" ||
             permission === "pointerLock" ||
-            permission === "fullscreen"
+            permission === "fullscreen" ||
+            permission === "keyboardLock"
         ) {
             return callback(true);
         }
@@ -77,7 +80,8 @@ function createWindow() {
             permission === "media" ||
             permission === "serial" ||
             permission === "pointerLock" ||
-            permission === "fullscreen"
+            permission === "fullscreen" ||
+            permission === "keyboardLock"
         ) {
             return true;
         }
