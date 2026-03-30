@@ -573,16 +573,44 @@
             .video-wrap:-webkit-full-screen {
                 margin: 0;
                 display: flex;
+                position: relative;
+                
                 background: var(--bg-color);
-                justify-content: center;
-                align-items: center;
+                align-items: start;
+            }
+
+            .video-wrap:fullscreen #stream,
+            .video-wrap:-webkit-full-screen #stream {
+                position: relative;
+                top: 50%;
+                left: 50%;
+                margin: 0 !important;
+                display: block;
+                max-width: none;
+                max-height: none;
+                transform-origin: center center;
+            }
+
+            .video-wrap:fullscreen #stream.rot0,
+            .video-wrap:-webkit-full-screen #stream.rot0 {
+                transform: translate(-50%, -50%) rotate(0deg) !important;
+            }
+
+            .video-wrap:fullscreen #stream.rot90,
+            .video-wrap:-webkit-full-screen #stream.rot90 {
+                transform: translate(-50%, -50%) rotate(90deg) !important;
+            }
+
+            .video-wrap:fullscreen #stream.rot180,
+            .video-wrap:-webkit-full-screen #stream.rot180 {
+                transform: translate(-50%, -50%) rotate(180deg) !important;
+            }
+
+            .video-wrap:fullscreen #stream.rot270,
+            .video-wrap:-webkit-full-screen #stream.rot270 {
+                transform: translate(-50%, -50%) rotate(270deg) !important;
             }
         
-        #stream {
-            
-
-        }
-
         #stream.rot0 {
             transform-origin: top left;
             transform: rotate(0deg) !important;
@@ -870,6 +898,8 @@
             width: 100%;
             height: 100%;
             background: var(--modal-alpha-bg);
+            overflow-x: auto;
+            overflow-y: auto;
         }
             .serial-setting-modal * {
                 font-size: 12px !important;
@@ -883,7 +913,11 @@
             width: 330px;
             padding: 0px 10px 0px 10px;
             box-sizing: border-box;
+            overflow-x: auto;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            min-width: 330px;
         }
             .serial-setting-content h3 {
                 text-align: center; /* 標題繼續置中 */
@@ -950,6 +984,14 @@
             .serial-setting-content .serial-input-left {
                 flex-grow: 1;
                 text-align: left;
+            }
+
+            .serial-setting-content .version-info {
+                margin-top: auto;
+                color: var(--text-color);
+                opacity: 0.65;
+                padding: 0 0 10px 0;
+                line-height: 1.2;
             }
 
         /* === Hotkey Recording Modal === */
@@ -1532,10 +1574,18 @@
             </div>
 
             <!-- Confirm -->
-            <div style="text-align:right; padding:10px">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:5px">
+                <button id="btn-refresh-devices" style="width:90px;padding:8px 18px;" data-i18n="setting.refresh">重新整理</button>
                 <button id="btn-apply-settings" style="padding:8px 18px;" data-i18n="setting.confirm">✔ 確定</button>
             </div>
 
+            <!-- Version -->
+            <div class="version-info">
+                <span data-i18n="setting.version">Version</span>
+                <span id="id_span_version1">1</span>.
+                <span id="id_span_version2">0</span>.
+                <span id="id_span_version3"></span>
+            </div>
         </div>
     </div>
 
