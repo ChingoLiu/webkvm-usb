@@ -14,11 +14,20 @@ function vidpidKey(p) {
     return `${vid}:${pid}`.toLowerCase();
 }
 
+function makeSerialPortLabel(p) {
+    const name = p.displayName || "Serial Port";
+    const portName = p.portName || "";
+
+    if (portName) {
+        return `${name} ${portName}`;
+    }
+
+    return name;
+}
+
 async function pickPortWithDialog(win, portList) {
-    const items = portList.map((p, i) => {
-        const key = vidpidKey(p);
-        const name = p.displayName ? ` - ${p.displayName}` : "";
-        return `${i}: ${key}${name}`;
+    const items = portList.map((p) => {
+        return makeSerialPortLabel(p);
     });
 
     const { response } = await dialog.showMessageBox(win, {
@@ -57,7 +66,7 @@ function createWindow() {
     win.loadFile(path.join(__dirname, "index.html"));
 
     // ✅ 開發工具（選擇性，建議開發時打開看看 serial 權限/事件）
-    //win.webContents.openDevTools({ mode: "detach" });
+    win.webContents.openDevTools({ mode: "detach" });
 
     const ses = win.webContents.session;
 

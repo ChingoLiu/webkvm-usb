@@ -1085,7 +1085,7 @@
     <div id="id_div_main" class="div-main">
         <div id="id_div_videoP" class="video-parent">
             <div id="videoBox" class="video-wrap">
-                <audio id="id_audio" autoplay></audio>
+                <audio id="id_audio" autoplay muted></audio>
                 <video id="stream" style="margin-top: 0; display: block; transform: none; filter: none;" tabindex="0" autoplay playsinline>Your browser doesn't support video</video>
                 <!-- 虛擬鍵盤 UI -->
                 <div class="keyboard-wrapper">
@@ -1449,7 +1449,7 @@
                 <div class="title1-box">
                     <div class="title1" data-i18n="status.title">狀態</div>
 
-                    <button class="toggleable-btnB active" id="id_button_mute">
+                    <button class="toggleable-btnB" id="id_button_mute">
                         <span class="btn-icon" id="id_span_mute"><img id="mute_icon" alt="mute" class="div_icon switch"></span>
                         <span class="btn-text" data-i18n="status.sound">聲音</span>
                     </button>
@@ -1534,12 +1534,7 @@
                 <div class="serial-row">
                     <div class="serial-label" data-i18n="setting.rotate">旋轉</div>
                     <div class="serial-input">
-                        <select id="selRotate">
-                            <option value="0" data-i18n="setting.rotate0">0°</option>
-                            <option value="90" data-i18n="setting.rotate90">90°</option>
-                            <option value="180" data-i18n="setting.rotate180">180°</option>
-                            <option value="270" data-i18n="setting.rotate270">270°</option>
-                        </select>
+                        <select id="selRotate"></select>
                     </div>
                 </div>
             </div>
