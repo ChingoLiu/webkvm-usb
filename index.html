@@ -1027,11 +1027,24 @@
             }
 
             .serial-setting-content .version-info {
+                display: flex;
                 margin-top: auto;
                 color: var(--text-color);
                 opacity: 0.65;
                 padding: 0 0 10px 0;
                 line-height: 1.2;
+                justify-content: space-between; /* 左右分開 */
+                align-items: center;            /* 垂直置中對齊 */
+            }
+            .serial-setting-content .version-info .download-btn {
+                color: var(--text-color);
+                text-decoration: underline;
+                white-space: nowrap;
+            }
+
+            .serial-setting-content .version-info .version-text {
+                white-space: nowrap;
+                text-align: left;
             }
 
         /* === Hotkey Recording Modal === */
@@ -1616,13 +1629,19 @@
                 <button id="btn-refresh-devices" style="width:90px;padding:8px 18px;" data-i18n="setting.refresh">重新整理</button>
                 <button id="btn-apply-settings" style="padding:8px 18px;" data-i18n="setting.confirm">✔ 確定</button>
             </div>
-
+            
             <!-- Version -->
             <div class="version-info">
-                <span data-i18n="setting.version">Version</span>
-                <span id="id_span_version1">1</span>.
-                <span id="id_span_version2">0</span>.
-                <span id="id_span_version3"></span>
+                <div class="version-text">
+                    <span data-i18n="setting.version">Version</span>
+                    <span id="id_span_version1">1</span>.
+                    <span id="id_span_version2">0</span>.
+                    <span id="id_span_version3"></span>
+                </div>
+
+                <a id="id_a_downloadTool" class="download-btn" data-i18n="setting.downloadTool" href="https://github.com/ChingoLiu/webkvm-usb/releases/download/v1.0.1/JVK202v101.exe" download>
+                    下載 JVK202 工具程式
+                </a>
             </div>
         </div>
     </div>
