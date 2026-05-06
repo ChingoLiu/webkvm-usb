@@ -1359,6 +1359,7 @@
                 <!-- ==========視窗========== -->
                 <div class="title1-box">
                     <div class="title1" data-i18n="window.title">視窗</div>
+                    
                     <div>
                         <button id="pip-button" class="toggleable-btn">
                             <span class="btn-icon"><img data-icon-light="icon/pip_light.png" data-icon-dark="icon/pip_dark.png" alt="pip" class="div_icon"></span>
@@ -1369,6 +1370,7 @@
                             <span class="btn-text" data-i18n="window.fullscreen">全螢幕</span>
                         </button>
                     </div>
+
                     <div>
                         <button id="snapshot-btn" class="toggleable-btn">
                             <span class="btn-icon"><img data-icon-light="icon/snapshot_light.png" data-icon-dark="icon/snapshot_dark.png" alt="snapshot" class="div_icon"></span>
@@ -1384,18 +1386,21 @@
                 <!-- ==========剪貼簿========== -->
                 <div class="title1-box">
                     <div class="title1" data-i18n="clipboard.title">剪貼簿</div>
+
                     <div>
                         <button class="sendButton" id="sendKeyboardBtn1"><img data-icon-light="icon/enter_light.png" data-icon-dark="icon/enter_dark.png" alt="enter" class="div_icon"></button>
                         <div class="top_div_input">
                             <input type="text" class="btn-input" id="id_text_clipboard1" data-i18n="clipboard1.placeholder" data-i18n-attr="placeholder" placeholder="1. 輸入英數符">
                         </div>
                     </div>
+
                     <div>
                         <button class="sendButton" id="sendKeyboardBtn2"><img data-icon-light="icon/enter_light.png" data-icon-dark="icon/enter_dark.png" alt="enter" class="div_icon"></button>
                         <div class="top_div_input">
                             <input type="text" class="btn-input" id="id_text_clipboard2" data-i18n="clipboard2.placeholder" data-i18n-attr="placeholder" placeholder="2. 輸入英數符">
                         </div>
                     </div>
+
                     <div>
                         <button class="sendButton" id="sendKeyboardBtn3"><img data-icon-light="icon/enter_light.png" data-icon-dark="icon/enter_dark.png" alt="enter" class="div_icon"></button>
                         <div class="top_div_input">
@@ -1412,18 +1417,21 @@
                 <!-- ==========熱鍵========== -->
                 <div class="title1-box">
                     <div class="title1" data-i18n="hotkey.title">熱鍵</div>
+
                     <div>
                         <button class="sendButton" id="id_btn_sendHotkey1"><img data-icon-light="icon/enter_light.png" data-icon-dark="icon/enter_dark.png" alt="enter" class="div_icon"></button>
                         <div class="top_div_input">
                             <input type="text" class="btn-input" id="id_text_sendHotkey1" data-i18n="hotkey1.placeholder" data-i18n-attr="placeholder" placeholder="1. 點擊設定" readonly>
                         </div>
                     </div>
+
                     <div>
                         <button class="sendButton" id="id_btn_sendHotkey2"><img data-icon-light="icon/enter_light.png" data-icon-dark="icon/enter_dark.png" alt="enter" class="div_icon"></button>
                         <div class="top_div_input">
                             <input type="text" class="btn-input" id="id_text_sendHotkey2" data-i18n="hotkey2.placeholder" data-i18n-attr="placeholder" placeholder="2. 點擊設定" readonly>
                         </div>
                     </div>
+
                     <div>
                         <button class="sendButton" id="id_btn_sendHotkey3"><img data-icon-light="icon/enter_light.png" data-icon-dark="icon/enter_dark.png" alt="enter" class="div_icon"></button>
                         <div class="top_div_input">
@@ -1446,6 +1454,7 @@
                 <!-- ==========滑鼠========== -->
                 <div class="title1-box">
                     <div class="title1" data-i18n="mouse.title">滑鼠</div>
+
                     <div>
                         <button id="lockMouse-btn" class="toggleable-btn">
                             <span class="btn-icon"><img data-icon-light="icon/relative_light.png" data-icon-dark="icon/relative_dark.png" alt="relative" class="div_icon"></span>
@@ -1477,12 +1486,15 @@
                             <span class="btn-textN" id="id_span_mouse_status"></span>
                         </button>
                     </div>
+
                     <div>
                         <div class="fps-chart-wrapper">
                             <canvas class="chart1" id="id_chart_fpsRender"></canvas>
                             <span id="id_span_fps" class="span_chartlabel">0fps</span>
                         </div>
                     </div>
+
+                    <span id="debug">0fps</span>
                 </div>
 
                 <!-- ==========設定========== -->
@@ -1564,6 +1576,31 @@
 
             <!-- Scroll speed -->
             <div class="setting-box">
+                <!-- Mouse report mode -->
+                <div class="serial-row">
+                    <div class="serial-label" data-i18n="setting.mouseReportMode">鼠標回報率</div>
+                    <div class="serial-input">
+                        <select id="id_select_mouse_report_mode">
+                            <option value="mouse" selected data-i18n="setting.mouseReportLow">一般模式</option>
+                            <option value="pointer" data-i18n="setting.mouseReportHigh">電競模式</option> 
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Relative mouse speed -->
+                <div class="serial-row">
+                    <div class="serial-label" data-i18n="setting.relCursorSpeed">相對滑鼠速度</div>
+                    <div class="serial-input">
+                        <select id="id_select_relative_mouse_speed">
+                            <option value="2.0" data-i18n="setting.relCursorSuperFast">最快</option>
+                            <option value="1.5" data-i18n="setting.relCursorFast">快</option>
+                            <option value="1" selected data-i18n="setting.relCursorMedium">中</option>
+                            <option value="0.7" data-i18n="setting.relCursorSlow">慢</option>
+                            <option value="0.4" data-i18n="setting.relCursorSuperSlow">最慢</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="serial-row">
                     <div class="serial-label" data-i18n="setting.scrollSpeed">滾輪速度</div>
                     <div class="serial-input">
@@ -1635,11 +1672,11 @@
                 <div class="version-text">
                     <span data-i18n="setting.version">Version</span>
                     <span id="id_span_version1">1</span>.
-                    <span id="id_span_version2">0</span>.
+                    <span id="id_span_version2">1</span>.
                     <span id="id_span_version3"></span>
                 </div>
 
-                <a id="id_a_downloadTool" class="download-btn" data-i18n="setting.downloadTool" href="https://github.com/ChingoLiu/webkvm-usb/releases/download/v1.0.1/JVK202v101.exe" download>
+                <a id="id_a_downloadTool" class="download-btn" data-i18n="setting.downloadTool" href="https://github.com/ChingoLiu/webkvm-usb/releases/download/v1.0.1/JVK202.exe" download>
                     下載 JVK202 工具程式
                 </a>
             </div>
