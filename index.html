@@ -1003,6 +1003,13 @@
                 margin: 5px 0;
             }
 
+            .serial-setting-content .text-serial-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: start;
+                margin: 0px 0;
+            }
+
             .serial-setting-content .serial-label {
                 font-size: 15px;
                 width: 160px; /* 固定欄寬 → 對齊整齊 */
@@ -1046,6 +1053,92 @@
                 white-space: nowrap;
                 text-align: left;
             }
+        
+        .device-status {
+            --device-label-w: 88px;
+            --device-state-w: 72px;
+
+            display: block;
+            width: 100%;
+            margin-top: 6px;
+            font-size: 12px;
+            line-height: 18px;
+            text-align: left;
+        }
+
+        .device-status-row {
+            display: grid !important;
+            grid-template-columns: var(--device-label-w) minmax(0, 1fr) var(--device-state-w);
+            column-gap: 4px;
+            align-items: start;
+            width: 100%;
+            min-height: 18px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .device-status-label {
+            display: block;
+            width: var(--device-label-w);
+            font-weight: bold;
+            text-align: left;
+            line-height: 18px;
+        }
+
+        .device-status-name {
+            width: 120px;
+            display: block;
+            min-width: 0;
+            text-align: left;
+            line-height: 18px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .device-status-state {
+            width: 80px;
+            display: block;
+            justify-self: end;
+            text-align: right;
+            line-height: 18px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .device-status-state.ok {
+            color: #22c55e;
+        }
+
+        .device-status-state.fail {
+            color: #ef4444;
+        }
+
+        .device-status-state.com-fail {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: flex-start;
+            line-height: 16px;
+        }
+
+        .device-status-fail {
+            display: block;
+            color: #ef4444;
+            font-weight: bold;
+            text-align: right;
+            line-height: 16px;
+        }
+
+        .device-status-auth {
+            display: block;
+            color: #ff8f49;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: underline;
+            text-align: right;
+            line-height: 16px;
+        }
 
         /* === Hotkey Recording Modal === */
         .hotkey-mask {
@@ -1493,6 +1586,8 @@
                             <span id="id_span_fps" class="span_chartlabel">0fps</span>
                         </div>
                     </div>
+
+                    <span id="debug">0fps</span>
                 </div>
 
                 <!-- ==========設定========== -->
@@ -1522,6 +1617,65 @@
             <!-- COM -->
             <div class="setting-box">
                 <div class="serial-row">
+                    <div class="serial-label" data-i18n="setting.deviceSelect">裝置</div>
+                    <div class="serial-input">
+                        <select id="selDevice"></select>
+                    </div>
+                </div>
+
+                <div class="text-serial-row">
+                    <div class="serial-label">UVC :</div>
+                    <div class="serial-input">
+                        <span id="id_status_uvc_name" class="device-status-name">-</span>
+                    </div>
+                    <div>
+                        <span id="id_status_uvc_state" class="device-status-state">-</span>
+                    </div>
+                </div>
+
+                <div class="text-serial-row">
+                    <div class="serial-label">UAC :</div>
+                    <div class="serial-input">
+                        <span id="id_status_uac_name" class="device-status-name">-</span>
+                    </div>
+                    <div>
+                        <span id="id_status_uac_state" class="device-status-state">-</span>
+                    </div>
+                </div>
+
+                <div class="text-serial-row">
+                    <div class="serial-label">COM :</div>
+                    <div class="serial-input">
+                        <span id="id_status_com_name" class="device-status-name">-</span>
+                    </div>
+                    <div>
+                        <span id="id_status_com_state" class="device-status-state">-</span>
+                    </div>
+                </div>
+
+                <!--
+                <div id="device-status" class="device-status">
+                    <div class="device-status-row">
+                        <span class="device-status-label">UVC :</span>
+                        <span id="id_status_uvc_name" class="device-status-name">-</span>
+                        <span id="id_status_uvc_state" class="device-status-state">-</span>
+                    </div>
+
+                    <div class="device-status-row">
+                        <span class="device-status-label">UAC :</span>
+                        <span id="id_status_uac_name" class="device-status-name">-</span>
+                        <span id="id_status_uac_state" class="device-status-state">-</span>
+                    </div>
+
+                    <div class="device-status-row">
+                        <span class="device-status-label">COM :</span>
+                        <span id="id_status_com_name" class="device-status-name">-</span>
+                        <span id="id_status_com_state" class="device-status-state">-</span>
+                    </div>
+                </div>
+                -->
+                
+                <div class="serial-row" style="display:none;">
                     <div class="serial-input-left">
                         <button id="btn-choose-port" data-i18n="setting.comSelect">選擇 COM 裝置</button>
                     </div>
@@ -1533,7 +1687,7 @@
 
             <!-- UVC -->
             <div class="setting-box">
-                <div class="serial-row">
+                <div class="serial-row" style="display:none;">
                     <div class="serial-label" data-i18n="setting.videoSource">影像來源</div>
                     <div class="serial-input">
                         <select id="selCam"></select>
@@ -1563,7 +1717,7 @@
             </div>
 
             <!-- UAC -->
-            <div class="setting-box">
+            <div class="setting-box" style="display:none;">
                 <div class="serial-row">
                     <div class="serial-label" data-i18n="setting.audioSource">聲音來源</div>
                     <div class="serial-input">
@@ -1670,7 +1824,7 @@
                 <div class="version-text">
                     <span data-i18n="setting.version">Version</span>
                     <span id="id_span_version1">1</span>.
-                    <span id="id_span_version2">1</span>.
+                    <span id="id_span_version2">2</span>.
                     <span id="id_span_version3"></span>
                 </div>
 
