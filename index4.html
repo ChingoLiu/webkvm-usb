@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NKVM202 Quad View - Electron</title>
+    <script src="dictionary.js"></script>
+    <script src="settingsStorage.js"></script>
+    <script src="commonUi.js"></script>
+    <script>
+        window.KVIM_UI.applyInitialRootSettings({
+            defaultLang: "zh-TW",
+            defaultTheme: "dark"
+        });
+    </script>
+
+    <link rel="stylesheet" href="./common.css">
+
+    <style>
+        html, body {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: var(--bg-topbar);
+            color: var(--text-color);
+            font-family: sans-serif;
+        }
+
+        .quad-root {
+            width: 100vw;
+            height: calc(100vh - 1px);
+            box-sizing: border-box;
+            padding: 0px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 0px;
+            background: var(--bg-color);
+        }
+
+        .quad-cell {
+            position: relative;
+            min-width: 0;
+            min-height: 0;
+            overflow: hidden;
+            border: 1px solid #444;
+            background: #000;
+        }
+
+        .quad-cell iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block;
+            background: #000;
+        }
+
+        .quad-settings-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--modal-alpha-bg);
+            color: var(--text-color);
+        }
+
+        .quad-settings-content {
+            width: auto;
+            height: auto;
+            max-width: 1920px;
+            max-height: calc(100vh - 42px);
+            box-sizing: border-box;
+            padding: 20px;
+            border-radius: 18px;
+            background: var(--bg-topbar);
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+            overflow: auto;
+        }
+
+        .quad-settings-title-grid {
+            display: grid;
+            grid-template-columns: 2fr max-content 2fr;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .quad-settings-title {
+            text-align: center;
+            font-size: 16px;
+            line-height: 20px;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .quad-link-button {
+            border: 0;
+            background: transparent;
+            box-shadow: none;
+            padding: 0 4px;
+            height: 26px;
+            color: #807e7d;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+            margin-top: 6px;
+        }
+
+        .quad-link-button:hover {
+            opacity: 0.85;
+        }
+
+        .quad-link-button:active {
+            transform: translateY(1px);
+        }
+
+        .quad-group-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .quad-group-row select {
+            width: 300px;
+            height: 26px;
+            font-size: 16px;
+            padding: 4px 10px;
+        }
+
+        .quad-status-line {
+            text-align: center;
+            color: #bbb;
+            font-size: 13px;
+            line-height: 18px;
+            min-height: 18px;
+            margin-bottom: 8px;
+            white-space: pre-line;
+        }
+
+        .quad-slot-grid {
+            display: grid;
+            grid-template-columns: max-content repeat(4, 180px);
+            gap: 12px;
+            align-items: start;
+        }
+
+        .quad-slot-panel {
+            border-radius: 16px;
+            background: var(--bg-topbar);
+            box-shadow: -4px -4px 8px var(--title-shadow-hi),
+                        3px 3px 3px var(--title-shadow-lo);
+            padding: 10px 10px 12px 10px;
+            min-width: 0;
+            margin-bottom: 10px;
+            width: 160px;
+        }
+
+        .quad-slot-panel select {
+            width: 100%;
+            height: 26px;
+            font-size: 14px;
+            padding: 2px 8px;
+            color: var(--text-color);
+            background: var(--bg-topbar);
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+        }
+
+        .quad-slot-panel button:active {
+            transform: translateY(1px);
+        }
+
+        .quad-slot-header {
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            text-align: center;
+        }
+
+        .quad-title-panel {
+            padding: 10px 0 12px 0;
+            min-width: max-content;
+            margin-bottom: 10px;
+        }
+
+        .quad-title-row,
+        .quad-value-row {
+            height: 26px;
+            min-height: 26px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .quad-title-row {
+            justify-content: flex-start;
+            font-size: 15px;
+            color: var(--text-color);
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .quad-value-row {
+            width: 100%;
+        }
+
+        .quad-state-row {
+            display: grid;
+            grid-template-columns: 1fr 38px;
+            column-gap: 2px;
+            align-items: center;
+            height: 16px;
+            min-height: 16px;
+            margin-bottom: 0px;
+            font-size: 14px;
+            color: var(--text-color);
+            font-weight: bold;
+            white-space: nowrap;
+
+            font-family: Consolas, "Courier New", monospace;
+        }
+
+        .quad-com-auth-value-row {
+            display: grid;
+            grid-template-columns: 10px 1fr;
+            column-gap: 6px;
+            align-items: center;
+            margin-top: 0px;
+            margin-bottom: 6px;
+            height: 16px;
+            min-height: 16px;
+            font-family: Consolas, "Courier New", monospace;
+            margin-bottom: 14px;
+        }
+
+        .quad-com-auth {
+            min-height: 16px;
+            line-height: 16px;
+            width: max-content;
+            max-width: none;
+            white-space: nowrap;
+            overflow: visible;
+            justify-self: end;
+            text-align: right;
+            color: #ff8f49;
+            font-weight: bold;
+            text-decoration: underline;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .quad-individual-panel {
+            border-radius: 16px;
+            background: var(--bg-topbar);
+            box-shadow: -4px -4px 8px var(--title-shadow-hi),
+                        3px 3px 3px var(--title-shadow-lo);
+            padding: 10px;
+            min-width: 0;
+            margin-bottom: 0px;
+            margin-right: 10px;
+            width: 260px;
+            height: 84px;
+        }
+
+        .quad-individual-panel button {
+            display: inline-flex;
+            flex-direction: column;
+            padding: 2px 4px 2px 4px;
+            width: 120px;
+            height: 26px;
+            justify-content: center;
+            align-items: center;
+            margin: 4px 4px;
+            border-radius: 18px;
+            border: 0px;
+            background: var(--bg-topbar);
+            box-shadow: -4px -4px 8px var(--title-shadow-hi),
+                        3px 3px 3px var(--title-shadow-lo);
+            cursor: pointer;
+            color: var(--text-color);
+        }
+        .quad-individual-panel button:active {
+            transform: translateY(1px);
+        }
+
+        .quad-row {
+            display: grid;
+            grid-template-columns: 2fr 3fr;
+            justify-content: space-between;
+            column-gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .quad-row select {
+            width: 100%;
+            height: 26px;
+            font-size: 14px;
+            padding: 2px 8px;
+            color: var(--text-color);
+            background: var(--bg-topbar);
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+        }
+
+        .quad-button-cell {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .download-btn {
+            color: var(--text-color);
+            text-decoration: underline;
+            white-space: nowrap;
+        }
+
+        .quad-label {
+            justify-content: flex-start;
+            font-size: 15px;
+            color: var(--text-color);
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .quad-name {
+            font-size: 14px;
+            color: var(--text-color);
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-weight: normal;
+        }
+
+        .quad-state {
+            font-size: 12px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .quad-state.ok {
+            color: #22c55e;
+        }
+
+        .quad-state.fail {
+            color: #ef4444;
+        }
+
+        .quad-state.unknown {
+            color: #ccc;
+        }
+
+        /* 單一 iframe 滿版模式 */
+        .quad-root.quad-focus-mode {
+            display: block;
+            padding: 0;
+            gap: 0;
+        }
+
+        .quad-root.quad-focus-mode .quad-cell {
+            display: none;
+        }
+
+        .quad-root.quad-focus-mode .quad-cell.quad-cell-focused {
+            display: block;
+            position: fixed;
+            inset: 0;
+            z-index: 999990;
+            width: 100vw;
+            height: 100vh;
+            border: 0;
+        }
+
+        .quad-root.quad-focus-mode .quad-cell.quad-cell-focused iframe {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="quad-root" class="quad-root"></div>
+
+    <div id="quad-settings-modal" class="quad-settings-modal" tabindex="-1">
+        <div class="quad-settings-content">
+            <div class="quad-settings-title-grid">
+                <div></div>
+                <div>
+                    <div class="quad-settings-title" data-i18n="quad.title">選擇 NKVM202 Quad 裝置群組</div>
+
+                    <div class="quad-group-row">
+                        <select id="quad-group-select"></select>
+                    </div>
+
+                    <div id="quad-status-line" class="quad-status-line" data-i18n="quad.status.init">初始化中...</div>
+                </div>
+                <div>
+                    <div class="quad-settings-title"></div>
+                    <button id="quad-refresh-btn" data-i18n="setting.refresh" class="quad-link-button">重新整理</button>
+                    <div class="quad-status-line"></div>
+                </div>
+            </div>
+
+            <div id="quad-slot-grid" class="quad-slot-grid"></div>
+
+            <div style="display:flex; justify-content: space-between;">
+                <div class="quad-individual-panel">
+                    <div class="quad-row">
+                        <label class="quad-label" for="qs_lang" data-i18n="setting.language">語言</label>
+                        <select id="qs_lang">
+                            <option value="zh-TW" data-i18n="setting.lan.zhTW">繁體中文</option>
+                            <option value="en" data-i18n="setting.lan.en">English</option>
+                        </select>
+                    </div>
+
+                    <div class="quad-row">
+                        <label class="quad-label" for="qs_theme" data-i18n="setting.theme">主題</label>
+                        <select id="qs_theme">
+                            <option value="light" data-i18n="setting.themeLight">明亮</option>
+                            <option value="dark" selected data-i18n="setting.themeDark">暗灰</option>
+                        </select>
+                    </div>
+
+                    <div class="quad-row">
+                        <label class="quad-label" for="qs_topbar_link" data-i18n="quad.topbarLink">工具列連動</label>
+
+                        <div style="text-align:left;">
+                            <input id="qs_topbar_link" type="checkbox" style="width:18px;height:18px;" checked>
+                        </div>
+
+                        <div></div>
+                    </div>
+                </div>
+
+                <div class="quad-individual-panel">
+                    <div class="quad-button-cell">
+                        &nbsp;
+                    </div>
+                    
+                    <div class="quad-button-cell">
+                        <button id="quad-reset-default-btn" data-i18n="setting.resetDefault">恢復預設</button>
+                    </div>
+                    
+                    <div class="quad-button-cell">
+                        <button id="quad-back-to-homepage-btn" data-i18n="setting.backToHome">返回首頁</button>
+                        <button id="quad-confirm-btn" data-i18n="setting.confirm">✔ 確定</button>
+                    </div>
+                </div>
+
+                <div class="quad-individual-panel">
+                    <div class="version-info">
+                        <a class="download-btn" href="https://chingoliu.github.io/webkvm-usb/" target="_blank" rel="noopener noreferrer">
+                            網頁版
+                        </a>
+                    </div>
+                    <div class="version-info">
+                        <a class="download-btn" data-i18n="setting.downloadTool.win" href="https://github.com/ChingoLiu/webkvm-usb/releases/download/v1.0.1/JVK202_Quad.exe" download>
+                            下載 JVK202 工具程式
+                        </a>
+                    </div>
+                    <div class="version-info">
+                        <a class="download-btn" data-i18n="setting.downloadTool.mac" href="https://github.com/ChingoLiu/webkvm-usb/releases/download/v1.0.1/JVK202-0.1.0-arm64-signed.dmg" download>
+                            下載 JVK202 工具程式
+                        </a>
+                    </div>
+                    <div class="version-info">
+                        <div></div>
+                        <div class="version-text">
+                            <span data-i18n="setting.version">Version</span>
+                            <span id="id_span_version1">1</span>.
+                            <span id="id_span_version2">1</span>.
+                            <span id="id_span_version3">2</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="index4.o.js"></script>
+
+</body>
+</html>
